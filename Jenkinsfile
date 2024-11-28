@@ -41,25 +41,27 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                   // Define SCP command
-                    def command = '''scp -o StrictHostKeyChecking=no -r C:\\Users\\thinkpad\\.jenkins\\workspace\\tripmydeal_api\\* root@103.211.218.88:/var/www/html/testapi/'''
+                    // Define the SCP command with dynamic workspace path
+                    def workspacePath = env.WORKSPACE // Jenkins automatically provides the current workspace
+                    def command = "scp -o StrictHostKeyChecking=no -r ${workspacePath}\\* root@103.211.218.88:/var/www/html/testapi/"
 
-                    // Execute the SCP command
+                    // Execute the SCP command (use bat for Windows systems)
+                    if (isUnix()) {
+                        sh command  // Unix-based systems
+                    } else {
+                        bat command  // Windows systems
+                    }
+
+                    // Check the exit value (success = 0) and log accordingly
                     def process = command.execute()
-
-                    // Wait for the command to complete
                     process.waitFor()
-
-                    // Check the exit value (success = 0)
                     if (process.exitValue() == 0) {
                         echo "Deployment successful"
                     } else {
-                        // Log error if SCP fails
                         echo "Error during file copy: ${process.err.text}"
                         echo "Exit code: ${process.exitValue()}"
                         echo "Output: ${process.text}"
                     }
-                    
                 }
             }
         }
