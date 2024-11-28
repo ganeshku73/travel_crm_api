@@ -42,11 +42,15 @@ pipeline {
             steps {
                 script {
                     echo "Starting deployment..."
-                    sshagent(['bigrock-ssh-key']) {
-                        echo "Using SSH agent with the specified key..."
-
-                        // Use the 'sh' step to run the SSH commands
+                    
+                    // Manually start SSH agent and add the SSH key
+                    if (isUnix()) {
                         sh '''
+                            echo "Starting SSH agent..."
+                            eval $(ssh-agent -s)  # Start the ssh-agent process
+                            echo "Adding SSH private key..."
+                            ssh-add <(echo "$SSH_PRIVATE_KEY")  # Add the private key (ensure it is set correctly)
+
                             echo "Copying files to the server..."
                             scp -o StrictHostKeyChecking=no -r * root@103.211.218.88:/var/www/html/testapi/
                             
@@ -68,6 +72,25 @@ pipeline {
                                 echo "Failed to execute deployment script."
                                 exit 1
                             fi
+
+                            # Kill the agent after deployment
+                            ssh-agent -k
+                        '''
+                    } else {
+                        // Windows alternative for starting ssh-agent and adding key (if required)
+                        bat '''
+                            echo Starting SSH agent...
+                            start-ssh-agent
+                            ssh-add $env.SSH_PRIVATE_KEY
+
+                            echo "Copying files to the server..."
+                            scp -o StrictHostKeyChecking=no -r * root@103.211.218.88:/var/www/html/testapi/
+
+                            echo "Running deployment script on the server..."
+                            ssh -o StrictHostKeyChecking=no root@103.211.218.88 'bash /var/www/html/testapi/deploy.sh'
+
+                            echo "Stopping SSH agent..."
+                            stop-ssh-agent
                         '''
                     }
                 }
