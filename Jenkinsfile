@@ -33,22 +33,32 @@ pipeline {
                         sh 'npm run build'
                     } else {
                         bat 'npm run build'
+                        echo "Build completed successfully"
+
                     }
                 }
             }
         }
 
-        // stage('Deploy') {
-        //     steps {
-        //         script {
-        //             if (isUnix()) {
-        //                 sh './deploy.sh'
-        //             } else {
-        //                 bat 'deploy.bat'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Deploy') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sshagent(['bigrock-ssh-key']) {
+                            // Copy deploy script to the server
+                            //sh 'scp -o StrictHostKeyChecking=no deploy.sh root@103.211.218.88:/root/deploy.sh'
+                            sh 'scp -o StrictHostKeyChecking=no -r * root@103.211.218.88:/var/www/html/testapi/'
+                            // Execute the deploy script on the remote server
+                            //sh 'ssh -o StrictHostKeyChecking=no root@103.211.218.88 "bash /root/deploy.sh"'
+                            sh 'ssh -o StrictHostKeyChecking=no root@103.211.218.88 "bash /var/www/html/testapi/deploy.sh"'
+               
+                        }
+                    } else {
+                        bat 'deploy.bat'
+                    }
+                }
+            }
+        }
     }
 
     post {
