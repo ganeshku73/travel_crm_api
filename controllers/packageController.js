@@ -287,15 +287,15 @@ async function packageRegister(req,res){
         const id = req.params.id;
         let query = {};
         let relatedPackages = '';
-        const package = await packageModel.findById(id).populate('location'); 
+        let packageData = await packageModel.findById(id).populate('location'); 
         
         // const rooms = await RoomModel.find({hotel_name:hotel._id}).populate('room_name');
         // result = { ...hotel.toObject(), rooms };
-        const result = package;
-        if (package.tour_max_people) {
+        const result = packageData;
+        if (packageData.tour_max_people) {
             query = {
-                tour_max_people:package.tour_max_people,
-               _id: { $ne: package._id }
+                tour_max_people:packageData.tour_max_people,
+               _id: { $ne: packageData._id }
             };
             //hotel._id
             relatedPackages = await packageModel.find(query).limit(5);; 
