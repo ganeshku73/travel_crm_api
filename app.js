@@ -30,5 +30,4 @@ app.use("/room",RoomRouter);
 app.use("/roomtype",RoomtypeRouter);
 app.use("/enquery",EnquieryRouter);
 
-
 module.exports = app;
