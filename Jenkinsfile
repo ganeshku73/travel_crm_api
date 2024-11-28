@@ -8,18 +8,36 @@ pipeline {
         }
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+               script {
+                    if (isUnix()) {
+                        sh 'npm install'  // Runs on Unix-based systems (Linux/macOS)
+                    } else {
+                        bat 'npm install'  // Runs on Windows systems
+                    }
+                }
             }
         }
         stage('Build') {
             steps {
-                sh 'npm run build'
+                script {
+                    if (isUnix()) {
+                        sh 'npm install'  // Runs on Unix-based systems (Linux/macOS)
+                    } else {
+                        bat 'npm install'  // Runs on Windows systems
+                    }
+                }
             }
         }
         stage('Deploy') {
             steps {
                 // Add your deployment commands here (e.g., SSH to server, or using Docker, Kubernetes, etc.)
-                sh 'npm run deploy'
+                script {
+                    if (isUnix()) {
+                        sh 'npm install'  // Runs on Unix-based systems (Linux/macOS)
+                    } else {
+                        bat 'npm install'  // Runs on Windows systems
+                    }
+                }
             }
         }
     }
