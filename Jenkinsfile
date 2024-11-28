@@ -1,6 +1,12 @@
 pipeline {
     agent any
     
+    environment {
+        // Reference the stored MongoDB URI credential
+        MONGODB_URI = credentials('MONGODB_URI')  // 'mongodb-uri' is the ID you gave the credential
+        JWT_KEY = credentials('JWT_KEY')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -27,6 +33,7 @@ pipeline {
                         sh 'npm run build'
                     } else {
                         bat 'npm run build'
+                        echo "MongoDB URI: ${env.MONGODB_URI}"
                     }
                 }
             }

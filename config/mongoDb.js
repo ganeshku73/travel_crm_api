@@ -10,8 +10,6 @@ database.on('error', (error) => {
     console.log(error)
 })
 
-
-
 database.once('connected', () => {
     console.log('Mongo Database Connected');
 })
