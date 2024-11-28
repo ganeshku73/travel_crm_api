@@ -41,58 +41,25 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    echo "Starting deployment..."
-                    
-                    // Manually start SSH agent and add the SSH key
-                    if (isUnix()) {
-                        sh '''
-                            echo "Starting SSH agent..."
-                            eval $(ssh-agent -s)  # Start the ssh-agent process
-                            echo "Adding SSH private key..."
-                            ssh-add <(echo "$SSH_PRIVATE_KEY")  # Add the private key (ensure it is set correctly)
+                   // Define SCP command
+                    def command = '''scp -o StrictHostKeyChecking=no -r C:\\Users\\thinkpad\\.jenkins\\workspace\\tripmydeal_api\\* root@103.211.218.88:/var/www/html/testapi/'''
 
-                            echo "Copying files to the server..."
-                            scp -o StrictHostKeyChecking=no -r * root@103.211.218.88:/var/www/html/testapi/
-                            
-                            # Check if SCP command was successful
-                            if [ $? -eq 0 ]; then
-                                echo "Files copied successfully."
-                            else
-                                echo "Failed to copy files."
-                                exit 1
-                            fi
+                    // Execute the SCP command
+                    def process = command.execute()
 
-                            echo "Running deployment script on the server..."
-                            ssh -o StrictHostKeyChecking=no root@103.211.218.88 'bash /var/www/html/testapi/deploy.sh'
+                    // Wait for the command to complete
+                    process.waitFor()
 
-                            # Check if SSH command was successful
-                            if [ $? -eq 0 ]; then
-                                echo "Deployment script executed successfully."
-                            else
-                                echo "Failed to execute deployment script."
-                                exit 1
-                            fi
-
-                            # Kill the agent after deployment
-                            ssh-agent -k
-                        '''
+                    // Check the exit value (success = 0)
+                    if (process.exitValue() == 0) {
+                        echo "Deployment successful"
                     } else {
-                        // Windows alternative for starting ssh-agent and adding key (if required)
-                        bat '''
-                            echo Starting SSH agent...
-                            start-ssh-agent
-                            ssh-add $env.SSH_PRIVATE_KEY
-
-                            echo "Copying files to the server..."
-                            scp -o StrictHostKeyChecking=no -r * root@103.211.218.88:/var/www/html/testapi/
-
-                            echo "Running deployment script on the server..."
-                            ssh -o StrictHostKeyChecking=no root@103.211.218.88 'bash /var/www/html/testapi/deploy.sh'
-
-                            echo "Stopping SSH agent..."
-                            stop-ssh-agent
-                        '''
+                        // Log error if SCP fails
+                        echo "Error during file copy: ${process.err.text}"
+                        echo "Exit code: ${process.exitValue()}"
+                        echo "Output: ${process.text}"
                     }
+                    
                 }
             }
         }
