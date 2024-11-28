@@ -44,15 +44,18 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sshagent(['bigrock-ssh-key']) {
-                        // Use the 'sh' step to run the SSH commands
-                        sh '''
-                            echo "Copying files to the server..."
-                            scp -o StrictHostKeyChecking=no -r * root@103.211.218.88:/var/www/html/testapi/
-
-                            echo "Running deployment script on the server..."
-                            ssh -o StrictHostKeyChecking=no root@103.211.218.88 'bash /var/www/html/testapi/deploy.sh'
-                        '''
+                    if (isUnix()) {
+                        sshagent(['bigrock-ssh-key']) {
+                            // Copy deploy script to the server
+                            //sh 'scp -o StrictHostKeyChecking=no deploy.sh root@103.211.218.88:/root/deploy.sh'
+                            sh 'scp -o StrictHostKeyChecking=no -r * root@103.211.218.88:/var/www/html/testapi/'
+                            // Execute the deploy script on the remote server
+                            //sh 'ssh -o StrictHostKeyChecking=no root@103.211.218.88 "bash /root/deploy.sh"'
+                            sh 'ssh -o StrictHostKeyChecking=no root@103.211.218.88 "bash /var/www/html/testapi/deploy.sh"'
+               
+                        }
+                    } else {
+                        bat 'deploy.bat'
                     }
                 }
             }
