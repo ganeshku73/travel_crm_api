@@ -3,7 +3,7 @@ const webpackNodeExternals = require('webpack-node-externals');
 
 module.exports = {
   // Entry point of your application
-  entry: './server.js',  // Update this to your actual entry file
+  entry: './app.js',  // Update this to your actual entry file
 
   // Output configuration
   output: {
