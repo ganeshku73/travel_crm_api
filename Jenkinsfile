@@ -1,14 +1,16 @@
 pipeline {
     agent any
+
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/ganeshku73/travel_crm_api.git'
+                checkout scm  // This checks out the code from your Git repository
             }
         }
+
         stage('Install Dependencies') {
             steps {
-               script {
+                script {
                     if (isUnix()) {
                         sh 'npm install'  // Runs on Unix-based systems (Linux/macOS)
                     } else {
@@ -17,28 +19,35 @@ pipeline {
                 }
             }
         }
+
         stage('Build') {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'npm install'  // Runs on Unix-based systems (Linux/macOS)
+                        sh 'npm run build'
                     } else {
-                        bat 'npm install'  // Runs on Windows systems
+                        bat 'npm run build'
                     }
                 }
             }
         }
+
         stage('Deploy') {
             steps {
-                // Add your deployment commands here (e.g., SSH to server, or using Docker, Kubernetes, etc.)
                 script {
                     if (isUnix()) {
-                        sh 'npm install'  // Runs on Unix-based systems (Linux/macOS)
+                        sh './deploy.sh'
                     } else {
-                        bat 'npm install'  // Runs on Windows systems
+                        bat 'deploy.bat'
                     }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'This will always run after all stages.'
         }
     }
 }
