@@ -33,23 +33,22 @@ pipeline {
                         sh 'npm run build'
                     } else {
                         bat 'npm run build'
-                        echo "MongoDB URI: ${env.MONGODB_URI}"
                     }
                 }
             }
         }
 
-        stage('Deploy') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh './deploy.sh'
-                    } else {
-                        bat 'deploy.bat'
-                    }
-                }
-            }
-        }
+        // stage('Deploy') {
+        //     steps {
+        //         script {
+        //             if (isUnix()) {
+        //                 sh './deploy.sh'
+        //             } else {
+        //                 bat 'deploy.bat'
+        //             }
+        //         }
+        //     }
+        // }
     }
 
     post {
