@@ -42,15 +42,15 @@ pipeline {
             steps {
                 script {
                     // Define the SCP command with dynamic workspace path
-            def workspacePath = env.WORKSPACE // Jenkins automatically provides the current workspace
-            def command = "scp -o StrictHostKeyChecking=no -r ${workspacePath}\\* root@103.211.218.88:/var/www/html/testapi/"
+                    def workspacePath = env.WORKSPACE // Jenkins automatically provides the current workspace
+                    def command = "scp -o StrictHostKeyChecking=no -r ${workspacePath}\\* root@103.211.218.88:/var/www/html/testapi/"
 
-            // Use 'sh' for Unix or 'bat' for Windows
-            if (isUnix()) {
-                sh command  // Unix-based systems
-            } else {
-                bat command  // Windows systems
-            }
+                    // Use 'sh' for Unix or 'bat' for Windows
+                    if (isUnix()) {
+                        sh command  // Unix-based systems
+                    } else {
+                        bat command  // Windows systems
+                    }
                 }
             }
         }
