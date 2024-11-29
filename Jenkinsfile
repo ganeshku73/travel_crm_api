@@ -42,26 +42,15 @@ pipeline {
             steps {
                 script {
                     // Define the SCP command with dynamic workspace path
-                    def workspacePath = env.WORKSPACE // Jenkins automatically provides the current workspace
-                    def command = "scp -o StrictHostKeyChecking=no -r ${workspacePath}\\* root@103.211.218.88:/var/www/html/testapi/"
+            def workspacePath = env.WORKSPACE // Jenkins automatically provides the current workspace
+            def command = "scp -o StrictHostKeyChecking=no -r ${workspacePath}\\* root@103.211.218.88:/var/www/html/testapi/"
 
-                    // Execute the SCP command (use bat for Windows systems)
-                    if (isUnix()) {
-                        sh command  // Unix-based systems
-                    } else {
-                        bat command  // Windows systems
-                    }
-
-                    // Check the exit value (success = 0) and log accordingly
-                    def process = command.execute()
-                    process.waitFor()
-                    if (process.exitValue() == 0) {
-                        echo "Deployment successful"
-                    } else {
-                        echo "Error during file copy: ${process.err.text}"
-                        echo "Exit code: ${process.exitValue()}"
-                        echo "Output: ${process.text}"
-                    }
+            // Use 'sh' for Unix or 'bat' for Windows
+            if (isUnix()) {
+                sh command  // Unix-based systems
+            } else {
+                bat command  // Windows systems
+            }
                 }
             }
         }
